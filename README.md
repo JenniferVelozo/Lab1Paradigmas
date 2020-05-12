@@ -6,3 +6,5 @@ Tenemos la función git, la cual retornará otra función dependiendo del comand
 La función append servirá para ir agregando archivos a los respectivos repositorios.
 Tener en consideración que cuando se quiera obtener el elemento de x posición, la primera posición es la 0. 
 Las zonas de trabajo serán trabajadas como listas que guarden strings (archivos)
+
+Se hizo un bosquejo de la función git 
