@@ -11,31 +11,8 @@
 ;Función git que permite aplicar los comandos
 ;Dominio: un string que indica el comando a ejecutar
 ;Recorrido: la función correspondiente al comando
-(define git (lambda (comando)
-              (lambda (zonas)
-                (if pull?
-                    (pull zonas)
-                    (if add?
-                        (lambda (archivo) ((archivo) zonas))
-                        (if commit?
-                            (lambda (mensaje) (((commit) mensaje)zonas))
-                            (if push?
-                                ((push) zonas)
-                                null)))))))
-
-#|(define add (lambda(workspace index)
-              ))
-
-(define pull (lambda()
-               ))|#
-
-;TDA commit
-(define commit(lambda(mensaje)
-                (if (string? mensaje))))
-
-#|(define pull (lambda()
-               ))|#
-
+;(define git (lambda (comando)
+;             ))
 
 
 ;Función que agrega un elemento al final de una lista
