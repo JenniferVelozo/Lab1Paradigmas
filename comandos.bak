@@ -1,0 +1,4 @@
+#lang racket
+(require "TDAzonas.rkt")
+(define add (lambda (lista) (lambda (zonas)
+                              (append (zonaIndex zonas) lista))))

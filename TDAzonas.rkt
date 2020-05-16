@@ -53,3 +53,6 @@
 (define localR '("hola2"))
 (define remoteR '("hola3"))
 (define zonas (zonasCons workspace index localR remoteR))
+
+(provide (all-defined-out))
+

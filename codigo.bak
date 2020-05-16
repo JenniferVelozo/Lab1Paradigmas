@@ -11,21 +11,47 @@
 ;Función git que permite aplicar los comandos
 ;Dominio: un string que indica el comando a ejecutar
 ;Recorrido: la función correspondiente al comando
-;(define git (lambda (comando)
-;             ))
+#|(define git (lambda (comando)
+              (lambda (zonas)
+                (if pull?
+                    (pull zonas)
+                    (if add?
+                        (lambda (archivo) ((archivo) zonas))
+                        (if commit?
+                            (lambda (mensaje) (((commit) mensaje)zonas))
+                            (if push?
+                                ((push) zonas)
+                                null)))))))|#
+
+#|(define add (lambda(workspace index)
+              ))
+
+(define pull (lambda()
+               ))|#
+
+
+
+#|(define pull (lambda()
+               ))|#
+
 
 
 ;Función que agrega un elemento al final de una lista
 ;Dominio: elemento x lista
 ;Recorrido: una lista con el elemento agregado
 ;Recursión: natural
-(define append (lambda(elemento lista)
+(define myAppend (lambda(elemento lista)
                  (if (null? lista)
                      (cons elemento null)
-                     (cons (car lista) (append (cdr lista) elemento))
+                     (cons (car lista) (myAppend elemento (cdr lista)))
                   )))
 
-
+(define myAppend2 (lambda (L1 L2)
+                     (if (null? L1)
+                         L2
+                         (if (null? L2)
+                             L1
+                             (cons (car L1) (myAppend2 (cdr L1) L2))))))
 ;Permite obtner el elemento ubicado en la posición que se indique
 ;Dominio: posicion x lista
 ;Recorrido: entrega el elemento que se encuentra en la posición indicada
@@ -42,3 +68,4 @@
       null)
   ))
 
+(provide (all-defined-out))

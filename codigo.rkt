@@ -11,7 +11,7 @@
 ;Función git que permite aplicar los comandos
 ;Dominio: un string que indica el comando a ejecutar
 ;Recorrido: la función correspondiente al comando
-(define git (lambda (comando)
+#|(define git (lambda (comando)
               (lambda (zonas)
                 (if pull?
                     (pull zonas)
@@ -21,35 +21,41 @@
                             (lambda (mensaje) (((commit) mensaje)zonas))
                             (if push?
                                 ((push) zonas)
-                                null)))))))
-
-#|(define add (lambda(workspace index)
-              ))
-
-(define pull (lambda()
-               ))|#
-
-;TDA commit
-(define commit(lambda(mensaje)
-                (if (string? mensaje))))
-
-#|(define pull (lambda()
-               ))|#
+                                null)))))))|#
 
 
+;desc:  entrega último elemento de la lista
+;dom: Lista
+;rec: Elemento de Lista
+;recursión: de cola
+(define getLast ( lambda (L) (if (null? (cdr L));si no queda nada en L
+                                 (car L);devolver la cabeza => (algo, null)
+                                 (getLast (cdr L))
+                                 )))
 
-;Función que agrega un elemento al final de una lista
+
+;Desc: agrega un elemento al final de una lista
 ;Dominio: elemento x lista
 ;Recorrido: una lista con el elemento agregado
 ;Recursión: natural
-(define append (lambda(elemento lista)
+(define myAppend (lambda(elemento lista)
                  (if (null? lista)
                      (cons elemento null)
-                     (cons (car lista) (append (cdr lista) elemento))
+                     (cons (car lista) (myAppend elemento (cdr lista)))
                   )))
 
+;Función que une dos listas
+;Dominio: lista x lista
+;Recorrido: una lista
+;Recursión: narural
+(define myAppend2 (lambda (L1 L2)
+                     (if (null? L1)
+                         L2
+                         (if (null? L2)
+                             L1
+                             (cons (car L1) (myAppend2 (cdr L1) L2))))))
 
-;Permite obtner el elemento ubicado en la posición que se indique
+;Permite obtener el elemento ubicado en la posición que se indique
 ;Dominio: posicion x lista
 ;Recorrido: entrega el elemento que se encuentra en la posición indicada
 ;Recursión: natural
@@ -65,3 +71,4 @@
       null)
   ))
 
+(provide (all-defined-out))
