@@ -27,32 +27,32 @@
 (define zonaWorkspace (lambda (zonas)
                         (if zonas?
                             (car zonas)
-                            null
+                            0
                             )))
 
 (define zonaIndex (lambda (zonas)
                     (if zonas?
                         (cadr zonas)
-                        null
+                        0
                         )))
 
 (define zonaLocalR(lambda (zonas)
                     (if zonas?
                         (caddr zonas)
-                        null
+                        0
                         )))
 
 (define zonaRemoteR (lambda (zonas)
                       (if zonas?
                           (cadddr zonas)
-                          null
+                          0
                           )))
 
-(define workspace '("hola0"))
-(define index '("hola1"))
-(define localR '("hola2"))
-(define remoteR '("hola3"))
-(define zonas (zonasCons workspace index localR remoteR))
+;Modificador
+(define setIndex (lambda (zonas listaIndex)
+                   (list (car zonas) listaIndex (caddr zonas) (cadddr zonas))
+                   ))
+
 
 (provide (all-defined-out))
 
