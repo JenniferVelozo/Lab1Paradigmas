@@ -2,43 +2,38 @@
 ;TDA commit
 
 ;Constructor
-;Dom: string x string x string
-;Rec: una lista con 3 strings
-(define commitCons (lambda (palabra1 palabra2 palabra3)
-                (if (and (string? palabra1) (string? palabra2) (string? palabra3))
-                    (list palabra1 palabra2 palabra3)
+;Desc: construye un commit en base a 2 palabras que corresponden al mensaje y los cambios hechos
+;Dom: string x string
+;Rec: una lista con 2 strings
+(define commitCons (lambda (palabra1 palabra2)
+                (if (and (string? palabra1) (string? palabra2))
+                    (list palabra1 palabra2)
                     null)))
 
 ;Pertenencia
+;Desc: verifica si el elemento entregado corresponde a un commit o no, el cual debe ser una lista de 2 elementos, donde cada uno de ellos es un string 
 ;Dom: lista
 ;Rec: un valor booleano
 (define commit? (lambda (commit)
-                    (if (and (list? commit)(= (length commit) 3) (string? (car commit)) (string? (cadr commit)) (string? (caddr commit)))
+                    (if (and (list? commit)(= (length commit) 2) (string? (car commit)) (string? (cadr commit)))
                         #t
                         #f)))
 
 ;Selectores
+;Desc: entrega un elemento específico del commit, ya sea el mensaje o los cambios hechos del commit
 ;Dom: lista
 ;Rec: un string o lista vacía
-(define autor (lambda (commit)
+(define mensaje (lambda (commit)
                         (if commit?
                             (car commit)
                             null
                             )))
 
-(define mensaje (lambda (commit)
-                    (if zonas?
+(define cambios (lambda (commit)
+                    (if commit?
                         (cadr commit)
                         null
                         )))
 
-(define cambios(lambda (commit)
-                    (if commit?
-                        (caddr commit)
-                        null
-                        )))
+(provide (all-defined-out))
 
-
-(define palabra1 "Jennifer")
-(define palabra2 "edicion")
-(define palabra3 "cambios")
