@@ -61,19 +61,19 @@
 ;dom: lista x lista
 ;rec: zonas
 (define setIndex (lambda (zonas listaIndex)
-                   (zonasCons (car zonas) listaIndex (caddr zonas) (cadddr zonas))))
+                   (zonasCons (zonaWorkspace zonas) listaIndex (zonaLocalR zonas) (zonaRemoteR zonas))))
 
 ;desc: crea nuevas zonas a partir de zonas de entrada reemplazando el valor correspondiente al la zona de trabajo Local Repository
 ;dom: lista x lista
 ;rec: zonas
 (define setLocalR (lambda (zonas listaLocal)
-                    (zonasCons (car zonas) (cadr zonas) listaLocal (cadddr zonas))))
+                    (zonasCons (zonaWorkspace zonas) (zonaIndex zonas) listaLocal (zonaRemoteR zonas))))
 
 ;desc: crea nuevas zonas a partir de zonas de entrada reemplazando el valor correspondiente al la zona de trabajo Remote Repository
 ;dom: lista x lista
 ;rec: zonas
 (define setRemoteR (lambda (zonas listaRemote)
-                    (zonasCons (car zonas) (cadr zonas) (caddr zonas) listaRemote)))
+                    (zonasCons (zonaWorkspace zonas) (zonaIndex zonas) (zonaLocalR zonas) listaRemote)))
 
 (provide (all-defined-out))
 

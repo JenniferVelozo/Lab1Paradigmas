@@ -23,7 +23,7 @@
 ;Función que une dos listas
 ;Dominio: lista x lista
 ;Recorrido: una lista
-;Recursión: narural
+;Recursión: natural
 (define myAppend2 (lambda (L1 L2)
                      (if (null? L1)
                          L2
