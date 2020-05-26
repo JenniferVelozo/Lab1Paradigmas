@@ -5,11 +5,15 @@
 
 (define workspace (list (list "archivo1" "contenido1") (list "archivo2" "contenido2") (list "archivo3" "contenido3")))
 (define index null)
-(define localR (list (list "commit1" (list( list "file1" "contenido1") (list"file2" "contenido2"))) ))
-(define remoteR (list (list "commit1" (list( list "file2" "contenido1") (list"file6" "contenido2"))) ))
+(define localR (list (list "chao" (list( list "file1" "contenido1") (list"file2" "contenido2"))) ))
+(define remoteR (list (list "hola" (list( list "file2" "contenido1") (list"file6" "contenido2"))) (list "hola" (list( list "file2" "contenido1") (list"file6" "contenido2")))))
 
 (define zonas (zonasCons workspace index localR remoteR))
+;----------------------------------- FUNCIÓN GIT ----------------------------------------------
 
+;----------------------------------- FUNCIÓN PULL ---------------------------------------------
+
+;----------------------------------- FUNCIÓN ADD ----------------------------------------------
 ;desc: función que añade los archivos de la lista 1, contenidos en el workspace, a una lista 2
 ;dom: lista x lista x lista
 ;rec: lista
@@ -29,7 +33,7 @@
 (define add (lambda (lista) (lambda (zonas)
                               (setIndex zonas (myAppend2 (zonaIndex zonas)(myAdd (zonaWorkspace zonas) lista '()))))))
 
-
+;----------------------------------- FUNCIÓN COMMIT ----------------------------------------------
 ;desc: función que crea un commit si hay cambios en el Index
 ;dom: string x lista
 ;rec: commit o 0 en caso que no hayan cambios en el Index
@@ -47,6 +51,7 @@
                        (display "No hay cambios en el Index")
                        (setIndex (setLocalR zonas (myAppend (commitAux mensaje zonas) (zonaLocalR zonas))) '()))))) ;el Index queda vacío
 
+;----------------------------------- FUNCIÓN PUSH ----------------------------------------------
 ;desc: permite saber si un elemento es parte de una lista
 ;dom: elemento x lista
 ;rec: booleano
@@ -74,3 +79,28 @@
 ;rec: lista (nueva versión de zonas donde se ven reflejados los cambios en el Remote Repository)
 (define push (lambda (zonas)
                (setRemoteR zonas (myPush (zonaLocalR zonas) (zonaRemoteR zonas)))))
+
+;----------------------------------- FUNCIÓN ZONAS->STRING ----------------------------------------------
+
+;tipo de recursión: de cola
+(define listToString (lambda (lista string)
+                   (if (null? lista)
+                       string
+                       (listToString (cdr lista) (string-append string (string-append (car(car lista)) " -> " (car(cdr(car lista))) "\n"))))))
+
+;tipo de recursión: de cola
+(define listToString2 (lambda (lista string)
+                        (if (null? lista)
+                            string
+                            (listToString2 (cdr lista) (string-append string "Mensaje: "(mensaje(car lista)) "\n" "Archivos: \n"(listToString (cambios(car lista)) "") " \n ")))))
+;desc: Función que recibe las zonas de trabajo y entrega una representación de las mismas como un string.
+;dom:lista (zonas)
+;rec: string
+(define string->zonas (lambda (zonas)
+                        (if (zonas? zonas)
+                            (string-append "\n**** CONTENIDO WORKSPACE **** \n" (listToString (zonaWorkspace zonas) "")
+                                                "\n**** CONTENIDO INDEX **** \n" (listToString (zonaIndex zonas) "")
+                                                "\n**** CONTENIDO LOCAL REPOSITORY **** \n" (listToString2 (zonaLocalR zonas) "")
+                                                "\n**** CONTENIDO REMOTE REPOSITORY **** \n" (listToString2 (zonaRemoteR zonas) ""))
+                            null)
+                        ))
