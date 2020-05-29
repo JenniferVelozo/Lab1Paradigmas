@@ -6,7 +6,8 @@
 (define workspace (list (list "archivo1" "contenido1") (list "archivo2" "contenido2") (list "archivo3" "contenido3")))
 (define index (list (list "file1.rkt" "codigo1") (list "file2.rkt" "codigo2")))
 (define localR (list (list "Edición" (list( list "file1" "contenido1") (list"file2" "contenido2"))) ))
-(define remoteR (list (list "Se editó archivo 2 y 6" (list( list "file2" "contenido1") (list"file6" "contenido2")))))
+(define remoteR (list (list "Se editó archivo 2 y 6" (list( list "file2" "contenido1") (list"file6" "contenido2"))) (list "Se editó archivo 2 y 6" (list( list "file2" "contenido1ver2") (list"file6" "contenido2")))))
+;(define remoteR null)
 
 (define zonas (zonasCons workspace index localR remoteR))
 ;----------------------------------- FUNCIÓN GIT ----------------------------------------------
@@ -20,7 +21,29 @@
                     (funcion parametro)))))
                     
 ;----------------------------------- FUNCIÓN PULL ---------------------------------------------
+(define myPull1 (lambda(cambios)
+                  (if (null? (cdr cambios))
+                      (list(car cambios))
+                      (append (list(car cambios)) (myPull1 (cdr cambios))))))
 
+(define myPull2 (lambda (remoteR)
+                  (if (null? remoteR)
+                      null
+                      (if (null? (cdr remoteR))
+                      (myPull1 (cambios (car remoteR)))
+                      (append (myPull1 (cambios (car remoteR))) (myPull2 (cdr remoteR)))))))
+                  
+
+(define myPull3 (lambda (L1 L2)
+                  (if (null? L1)
+                      L2
+                      (if (noEstaArchivo? (car L1) L2)
+                          (myPull3 (cdr L1) (append (list (car L1)) L2))
+                          (myPull3 (cdr L1) L2)
+                          ))))
+
+(define pull (lambda (zonas)
+               (setWorkspace zonas (myPull3 (zonaWorkspace zonas) (myPull3 (reverse (myPull2 (zonaRemoteR zonas))) null)))))
 ;----------------------------------- FUNCIÓN ADD ----------------------------------------------
 ;desc: función que añade los archivos de la lista 1, contenidos en el workspace, a una lista 2
 ;dom: lista x lista x lista
@@ -70,16 +93,6 @@
                    )))
 
 ;----------------------------------- FUNCIÓN PUSH ----------------------------------------------
-;desc: permite saber si un elemento es parte de una lista
-;dom: elemento x lista
-;rec: booleano
-;tipo de recursión: de cola
-(define esta? (lambda (elemento lista)
-                   (if (null? lista);si la lista ingresada es nula, se retorna falso
-                       #f
-                       (if (equal? elemento (car lista)) ;si el elemento evaluado es igual al primer elemento de la lista, se retorna verdadero
-                           #t
-                           (esta? elemento (cdr lista))))));sino, se busca el elemento en la cola de la lista
 ;desc: Función auxiliar que entrega el Repositorio Remoto modificado
 ;dom: lista x lista
 ;rec: lista (repositorio remoto modificado)
@@ -132,3 +145,5 @@
                                                 "\n**** CONTENIDO REMOTE REPOSITORY **** \n" (listToString2 (zonaRemoteR zonas) ""))
                             "El parametro ingresado no corresponde a una zona");sino se retorna un mensaje de error
                         ))
+
+(pull zonas)
