@@ -57,6 +57,11 @@
                           )))
 
 ;Modificadores
+;desc: crea nuevas zonas a partir de zonas de entrada reemplazando el valor correspondiente al la zona de trabajo Workspace
+;dom: lista x lista
+;rec: zonas
+(define setWorkspace (lambda (zonas listaWorkspace)
+                   (zonasCons listaWorkspace (zonaIndex zonas) (zonaLocalR zonas) (zonaRemoteR zonas))))
 ;desc: crea nuevas zonas a partir de zonas de entrada reemplazando el valor correspondiente al la zona de trabajo Index
 ;dom: lista x lista
 ;rec: zonas
