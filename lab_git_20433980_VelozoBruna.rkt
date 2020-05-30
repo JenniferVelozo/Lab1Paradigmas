@@ -58,7 +58,10 @@
 ;dom: zonas
 ;rec: lista (nueva versión de zonas)
 (define pull (lambda (zonas)
-               (setRegistroComandos (setWorkspace zonas (myPull3 (zonaWorkspace zonas) (myPull3 (reverse (myPull2 (zonaRemoteR zonas))) null))) (myAppend "pull" (comandos zonas)))))
+               (if (zonas? zonas)
+                   (setRegistroComandos (setWorkspace zonas (myPull3 (zonaWorkspace zonas) (myPull3 (reverse (myPull2 (zonaRemoteR zonas))) null)))
+                                        (myAppend "pull" (comandos zonas)))
+                   (display "El parametro ingresado no crresponde a una zona"))))
 
 ;--------------------------------------------------------------- FUNCIÓN ADD ----------------------------------------------------------------------
 ;desc: función que añade los archivos de la lista 1, contenidos en el workspace, a una lista 2
@@ -116,10 +119,10 @@
                  (lambda (zonas)
                    (if (and(string? mensaje) (zonas? zonas))
                        (if (equal? (commitAux mensaje zonas) 0) ;si el Index está vaciío, significa que no hay cambios en él
-                       (display "No hay cambios en el Index")
-                       ;Sino, se modifica el index, el cual queda vacío, y además, se modifica el Local Repostiroy, al cual se le agrega el commit creado
-                       (setRegistroComandos (setIndex (setLocalR zonas (myAppend (commitAux mensaje zonas) (zonaLocalR zonas))) '()) (myAppend "commit" (comandos zonas))))
-                       (display "No se ingresaron los parametros correctos"))
+                            (display "No hay cambios en el Index\n")
+                            ;Sino, se modifica el index, el cual queda vacío, y además, se modifica el Local Repostiroy, al cual se le agrega el commit creado
+                            (setRegistroComandos (setIndex (setLocalR zonas (myAppend (commitAux mensaje zonas) (zonaLocalR zonas))) '()) (myAppend "commit" (comandos zonas))))
+                       (display "No se ingresaron los parametros correctos\n"))
                    )))
 
 ;------------------------------------------------------------- FUNCIÓN PUSH --------------------------------------------------------------------
@@ -189,3 +192,105 @@
                                                 "\n**** REGISTRO DE COMANDOS **** \n" (listToString3 (comandos zonas) ""))
                             "El parametro ingresado no corresponde a una zona");sino se retorna un mensaje de error
                         ))
+
+;--------------------------------------- EJEMPLOS DE USO ---------------------------------------------------
+;FUNCIÓN GIT
+
+#|
+;Se definen previamente las zonas de trabajo
+(define workspace (list (list "archivo1.rkt" "contenido1") (list "archivo2.rkt" "contenido2") (list "archivo3.rkt" "contenido3")))
+(define index (list (list "codigo1.rkt" "contenido codigo1") (list "codigo2.rkt" "contenido codigo2")))
+(define localR (list (list "Edición" (list( list "file1.rkt" "contenido1 versión 2") (list "file2.rkt" "contenido2 versión 5"))) ))
+(define remoteR (list (list "Se editó archivo 2 y 6" (list( list "file2.rkt" "contenido1") (list"file6.rkt" "contenido2"))) (list "Se editó archivo 2" (list( list "file2.rkt" "contenido1ver2") (list"file6.rkt" "contenido2")))))
+
+(define zonas (zonasCons workspace index localR remoteR null))
+;3 ejemplos de uso de git
+((git push)zonas)
+(((git add)'("archivo1.rkt" "archivo3.rkt"))zonas)
+(((git commit)"myCommit")zonas)
+|#
+
+;FUNCIÓN PULL
+#|
+;Se definen previamente las zonas de trabajo
+(define workspace (list (list "archivo1.rkt" "contenido1") (list "archivo2.rkt" "contenido2") (list "archivo3.rkt" "contenido3")))
+(define index (list (list "codigo1.rkt" "contenido codigo1") (list "codigo2.rkt" "contenido codigo2")))
+(define localR (list (list "Edición" (list( list "file1.rkt" "contenido1 versión 2") (list "file2.rkt" "contenido2 versión 5"))) ))
+(define remoteR (list (list "Se editó archivo 2 y 6" (list( list "file2.rkt" "contenido1") (list"file6.rkt" "contenido2"))) (list "Se editó archivo 2" (list( list "file2.rkt" "contenido1ver2") (list"file6.rkt" "contenido2 actualizado")))))
+(define zonas (zonasCons workspace index localR remoteR null))
+
+;3 ejemplos de uso de pull
+(pull zonas)
+(pull ((add (list "archivo1.rkt" "archivo2.rkt"))zonas))
+(pull ((commit "mi primer commit")zonas))
+|#
+
+;FUNCIÓN ADD
+#|
+;Se definen previamente las zonas de trabajo
+(define workspace (list (list "archivo1.rkt" "contenido1") (list "archivo2.rkt" "contenido2") (list "archivo3.rkt" "contenido3")))
+(define index (list (list "codigo1.rkt" "contenido codigo1") (list "codigo2.rkt" "contenido codigo2")))
+(define localR (list (list "Edición" (list( list "file1.rkt" "contenido1 versión 2") (list "file2.rkt" "contenido2 versión 5"))) ))
+(define remoteR (list (list "Se editó archivo 2 y 6" (list( list "file2.rkt" "contenido1") (list"file6.rkt" "contenido2"))) (list "Se editó archivo 2" (list( list "file2.rkt" "contenido1ver2") (list"file6.rkt" "contenido2")))))
+
+(define zonas (zonasCons workspace index localR remoteR null))
+
+;3 ejemplos de uso de add
+((add (list "archivo3.rkt"))zonas)
+((add (list "archivo1.rkt" "archivo2.rkt"))zonas)
+((add (list "archivo2.rkt"))zonas)
+|#
+
+;FUNCIÓN COMMIT
+#|
+;Se definen previamente las zonas de trabajo
+(define workspace (list (list "archivo1.rkt" "contenido1") (list "archivo2.rkt" "contenido2") (list "archivo3.rkt" "contenido3")))
+(define index (list (list "codigo1.rkt" "contenido codigo1") (list "codigo2.rkt" "contenido codigo2")))
+(define localR (list (list "Edición" (list( list "file1.rkt" "contenido1 versión 2") (list "file2.rkt" "contenido2 versión 5"))) ))
+(define remoteR (list (list "Se editó archivo 2 y 6" (list( list "file2.rkt" "contenido1") (list"file6.rkt" "contenido2"))) (list "Se editó archivo 2" (list( list "file2.rkt" "contenido1ver2") (list"file6.rkt" "contenido2")))))
+
+(define zonas (zonasCons workspace index localR remoteR null))
+
+;3 ejemplos de uso commit
+((commit "mi segundo commit")zonas)
+((commit "prueba")'((("archivo1.rkt" "contenido1") ("archivo2.rkt" "contenido2") ("archivo3.rkt" "contenido3"))
+  ()
+  (("Edición" (("file1.rkt" "contenido1 versión 2") ("file2.rkt" "contenido2 versión 5")))
+   ("mi segundo commit" (("codigo1.rkt" "contenido codigo1") ("codigo2.rkt" "contenido codigo2"))))
+  (("Se editó archivo 2 y 6" (("file2.rkt" "contenido1") ("file6.rkt" "contenido2")))
+   ("Se editó archivo 2" (("file2.rkt" "contenido1ver2") ("file6.rkt" "contenido2"))))
+  ("commit")))
+
+((commit "tercer commit")(push zonas))
+|#
+
+;FUNCIÓN PUSH
+;Se definen previamente las zonas de trabajo
+#|
+(define workspace (list (list "archivo1.rkt" "contenido1") (list "archivo2.rkt" "contenido2") (list "archivo3.rkt" "contenido3")))
+(define index (list (list "codigo1.rkt" "contenido codigo1") (list "codigo2.rkt" "contenido codigo2")))
+(define localR (list (list "Edición" (list( list "file1.rkt" "contenido1 versión 2") (list "file2.rkt" "contenido2 versión 5"))) ))
+(define remoteR (list (list "Se editó archivo 2 y 6" (list( list "file2.rkt" "contenido1") (list"file6.rkt" "contenido2"))) (list "Se editó archivo 2" (list( list "file2.rkt" "contenido1ver2") (list"file6.rkt" "contenido2")))))
+
+(define zonas (zonasCons workspace index localR remoteR null))
+
+;3 ejemplos de uso de push
+(push zonas)
+(push ((commit "mi primer commit")zonas))
+(push ((add '("archivo1.rkt" "archivo3.rkt"))zonas))
+|#
+
+;FUNCIÓN ZONAS->STRING
+;Se definen previamente las zonas de trabajo
+#|
+(define workspace (list (list "archivo1.rkt" "contenido1") (list "archivo2.rkt" "contenido2") (list "archivo3.rkt" "contenido3")))
+(define index (list (list "codigo1.rkt" "contenido codigo1") (list "codigo2.rkt" "contenido codigo2")))
+(define localR (list (list "Edición" (list( list "file1.rkt" "contenido1 versión 2") (list "file2.rkt" "contenido2 versión 5"))) ))
+(define remoteR (list (list "Se editó archivo 2 y 6" (list( list "file2.rkt" "contenido1") (list"file6.rkt" "contenido2"))) (list "Se editó archivo 2" (list( list "file2.rkt" "contenido1ver2") (list"file6.rkt" "contenido2")))))
+
+(define zonas (zonasCons workspace index localR remoteR null))
+;3 ejemplos de uso de zonas->string
+(zonas->string zonas)
+(zonas->string (pull zonas))
+(zonas->string ((commit "primer commit") ((add (list "archivo2.rkt"))zonas)))
+|#
