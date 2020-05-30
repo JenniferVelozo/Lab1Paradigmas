@@ -7,25 +7,35 @@
 (define index (list (list "file1.rkt" "codigo1") (list "file2.rkt" "codigo2")))
 (define localR (list (list "Edición" (list( list "file1" "contenido1") (list"file2" "contenido2"))) ))
 (define remoteR (list (list "Se editó archivo 2 y 6" (list( list "file2" "contenido1") (list"file6" "contenido2"))) (list "Se editó archivo 2 y 6" (list( list "file2" "contenido1ver2") (list"file6" "contenido2")))))
-;(define remoteR null)
 
-(define zonas (zonasCons workspace index localR remoteR))
-;----------------------------------- FUNCIÓN GIT ----------------------------------------------
+(define zonas (zonasCons workspace index localR remoteR null))
+;----------------------------------------------------- FUNCIÓN GIT ------------------------------------------------------------------------
 ;desc:Función que permite aplicar los comandos sobre las zonas de trabajo.
 ;dom: funcion x parámetro
 ;rec: una función que recibe los parámetros propios del comando que se pretende aplicar.
 (define git (lambda (funcion)
               (lambda(parametro)
-                (if (not(or (equal? funcion add) (equal? funcion push) (equal? funcion commit) (equal? funcion zonas->string)))
+                ;si la función ingresada no es igual a pull, add, push, commit o zonas->string
+                (if (not(or (equal? funcion pull)(equal? funcion add) (equal? funcion push) (equal? funcion commit) (equal? funcion zonas->string)))
+                    ;se entrega un mensaje avisando que comando ingresado no existe
                     (display "El comando ingresado no existe")
+                    ;sino, se aplica la funcion al parametro ingresado
                     (funcion parametro)))))
-                    
-;----------------------------------- FUNCIÓN PULL ---------------------------------------------
+ 
+;---------------------------------------------------- FUNCIÓN PULL ------------------------------------------------------------------------
+;desc: función que entrega una lista con los cambios de un commit
+;dom: cambios hechos (lista)
+;rec: lista
+;tipo de recursión: natural
 (define myPull1 (lambda(cambios)
                   (if (null? (cdr cambios))
                       (list(car cambios))
                       (append (list(car cambios)) (myPull1 (cdr cambios))))))
 
+;desc: función que entrega una lista sólo con los archivos que posee el Remote Repository
+;dom: lista (remote repository)
+;rec: lista
+;tipo de recursión: natural
 (define myPull2 (lambda (remoteR)
                   (if (null? remoteR)
                       null
@@ -33,7 +43,10 @@
                       (myPull1 (cambios (car remoteR)))
                       (append (myPull1 (cambios (car remoteR))) (myPull2 (cdr remoteR)))))))
                   
-
+;desc: función que entrega una lista de aquellos archivos de la lista 2 que no están en la lista 1
+;dom: lista x lista
+;rec: lista
+;tipo de recursión: natural
 (define myPull3 (lambda (L1 L2)
                   (if (null? L1)
                       L2
@@ -41,10 +54,13 @@
                           (myPull3 (cdr L1) (append (list (car L1)) L2))
                           (myPull3 (cdr L1) L2)
                           ))))
-
+;desc:Función que retorna una lista con todos los cambios (commits) desde el RemoteRepository al Workspace 
+;dom: zonas
+;rec: lista (nueva versión de zonas)
 (define pull (lambda (zonas)
-               (setWorkspace zonas (myPull3 (zonaWorkspace zonas) (myPull3 (reverse (myPull2 (zonaRemoteR zonas))) null)))))
-;----------------------------------- FUNCIÓN ADD ----------------------------------------------
+               (setRegistroComandos (setWorkspace zonas (myPull3 (zonaWorkspace zonas) (myPull3 (reverse (myPull2 (zonaRemoteR zonas))) null))) (myAppend "pull" (comandos zonas)))))
+
+;--------------------------------------------------------------- FUNCIÓN ADD ----------------------------------------------------------------------
 ;desc: función que añade los archivos de la lista 1, contenidos en el workspace, a una lista 2
 ;dom: lista x lista x lista
 ;rec: lista
@@ -54,23 +70,37 @@
                                         L2
                                         (if (null? workspace) ;si el workspace es nulo, se retorna null
                                             null
-                                            (if (equal? (car L1) (caar workspace)) ;se pregunta si el nombre del primer archivo es igual al nombre del primer archivo del workspace
+                                            (if (equal? (car L1) (caar workspace))
+                                                ;se pregunta si el nombre del primer archivo es igual al nombre del primer archivo del workspace
                                                 (myAdd workspace(cdr L1)(myAppend (car workspace) L2));si es así, se revisa la cola de la lista 1, y se agrega el archivo revisado anteriormente a la lista 2
                                                 (myAdd (cdr workspace) L1 L2))))));sino, se revisa la misma lista1 pero en la cola del workspace
 
+;desc: función que entrega una lista de aquellos archivos que no estén en el Index, para que no se agreguen nuevamente
+;dom: lista x lista 
+;rec: lista
+;tipo de recursión: de cola
+(define appendIndex (lambda (add index)
+                      (if (null? add)
+                          index
+                          (if (noEstaArchivo? (car add) index)
+                              (appendIndex (cdr add) (append index (list (car add))))
+                              (appendIndex (cdr add) index )))))
 ;desc:Función que añade los cambios locales registrados en el Workspace al Index registrados en las zonas de trabajo
 ;dom: lista 
 ;rec: lista (nueva versión de zonas donde se ven reflejados los cambios)
 (define add (lambda (lista) (lambda (zonas)
                               (if (and (list? lista) (zonas? zonas))
-                                  ;se modifica el Index, uniendo la lista Index con la lista de archivos que se desea agregar
-                                  (setIndex zonas (myAppend2 (zonaIndex zonas)(myAdd (zonaWorkspace zonas) lista '())))
-                                  (display "No se ingresaron los parametros correctos");para indicar que no e ingresaron los paramtros correctos
-                              ))))
+                                  (if (andmap string? lista)
+                                      
+                                      ;se modifica el Index, uniendo la lista Index con la lista de archivos que se desea agregar
+                                      (setRegistroComandos (setIndex zonas (appendIndex (myAdd (zonaWorkspace zonas) lista '()) (zonaIndex zonas))) (myAppend "add" (comandos zonas)))
+                                      (display "Debe ingresar una lista de archivos"));para indicar que no e ingresaron los parametros correctos
+                           
+                                  (display "No se ingresaron los parametros correctos")))))
                                   
                               
 
-;----------------------------------- FUNCIÓN COMMIT ----------------------------------------------
+;-------------------------------------------------------------- FUNCIÓN COMMIT -------------------------------------------------------------------
 ;desc: función que crea un commit si hay cambios en el Index
 ;dom: string x lista
 ;rec: commit o 0 en caso que no hayan cambios en el Index
@@ -88,11 +118,11 @@
                        (if (equal? (commitAux mensaje zonas) 0) ;si el Index está vaciío, significa que no hay cambios en él
                        (display "No hay cambios en el Index")
                        ;Sino, se modifica el index, el cual queda vacío, y además, se modifica el Local Repostiroy, al cual se le agrega el commit creado
-                       (setIndex (setLocalR zonas (myAppend (commitAux mensaje zonas) (zonaLocalR zonas))) '()))
+                       (setRegistroComandos (setIndex (setLocalR zonas (myAppend (commitAux mensaje zonas) (zonaLocalR zonas))) '()) (myAppend "commit" (comandos zonas))))
                        (display "No se ingresaron los parametros correctos"))
                    )))
 
-;----------------------------------- FUNCIÓN PUSH ----------------------------------------------
+;------------------------------------------------------------- FUNCIÓN PUSH --------------------------------------------------------------------
 ;desc: Función auxiliar que entrega el Repositorio Remoto modificado
 ;dom: lista x lista
 ;rec: lista (repositorio remoto modificado)
@@ -111,11 +141,11 @@
 (define push (lambda (zonas)
                (if (zonas? zonas)
                    ;se modifica el repositorio remoto
-                   (setRemoteR zonas (myPush (zonaLocalR zonas) (zonaRemoteR zonas)))
+                   (setRegistroComandos (setRemoteR zonas (myPush (zonaLocalR zonas) (zonaRemoteR zonas))) (myAppend "push" (comandos zonas)))
                    (display "El parametro ingresado no corresponde a una zona"))
                ))
 
-;----------------------------------- FUNCIÓN ZONAS->STRING ----------------------------------------------
+;------------------------------------------------------------- FUNCIÓN ZONAS->STRING ----------------------------------------------------------------
 ;desc: Función que transforma el Workspace y el Index a un string
 ;dom: lista x string
 ;rec: string
@@ -134,6 +164,15 @@
                             string
                             ;sino , se revisa la cola la lista y se unen los strings, es decir el mensaje del commit y los cambios hechos (archivos)
                             (listToString2 (cdr lista) (string-append string "Mensaje: "(mensaje(car lista)) "\n" "Archivos: \n"(listToString (cambios(car lista)) "") " \n ")))))
+
+;desc: Función que transforma una lista a string
+;dom: lista x string
+;rec: string
+;tipo de recursión: de cola
+(define listToString3 (lambda (lista string)
+                        (if (null? lista)
+                            string
+                            (listToString3 (cdr lista) (string-append string (car lista))))))
 ;desc: Función que recibe las zonas de trabajo y entrega una representación de las mismas como un string.
 ;dom:lista (zonas)
 ;rec: string
@@ -142,8 +181,7 @@
                             (string-append "\n**** CONTENIDO WORKSPACE **** \n" (listToString (zonaWorkspace zonas) "")
                                                 "\n**** CONTENIDO INDEX **** \n" (listToString (zonaIndex zonas) "")
                                                 "\n**** CONTENIDO LOCAL REPOSITORY **** \n" (listToString2 (zonaLocalR zonas) "")
-                                                "\n**** CONTENIDO REMOTE REPOSITORY **** \n" (listToString2 (zonaRemoteR zonas) ""))
+                                                "\n**** CONTENIDO REMOTE REPOSITORY **** \n" (listToString2 (zonaRemoteR zonas) "")
+                                                "\n**** REGISTRO DE COMANDOS **** \n" (listToString3 (comandos zonas) ""))
                             "El parametro ingresado no corresponde a una zona");sino se retorna un mensaje de error
                         ))
-
-(pull zonas)

@@ -24,7 +24,7 @@
 ;dom: commit
 ;rec: string
 (define mensaje (lambda (commit)
-                        (if commit?
+                        (if (commit? commit)
                             (car commit)
                             null
                             )))
@@ -33,7 +33,7 @@
 ;dom: commit
 ;rec: lista
 (define cambios (lambda (commit)
-                    (if commit?
+                    (if (commit? commit)
                         (cadr commit)
                         0 ;ya que los cambios son una lista y puede estar vacía
                         )))
