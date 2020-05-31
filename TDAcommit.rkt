@@ -1,22 +1,27 @@
 #lang racket
+(require "funcionesGenerales.rkt")
 ;TDA commit
+;Un commit se representa como una lista de 2 elementos, donde el primero corresponde a un string que representa el mensaje descriptivo del commit
+;y el segundo elemento es una lista de archivos que representa los cambios hechos en el commit. Es útil mencionar que los archivos se representan como listas
+;de 2 elementos de tipo string, donde el primero indica el nombre de archivo, y el segundo, su contenido.
 
 ;Constructor
 ;Desc: permite crear un commit, el cual contiene un mensaje y los cambios hechos
 ;Dom: string x lista
-;Rec: una lista
+;Rec: lista
 (define commitCons (lambda (mensaje cambios)
-                (if (and (string? mensaje) (list? cambios))
-                    (list mensaje cambios)
+                (if (and (string? mensaje) (list? cambios) (andmap esArchivo? cambios)) ;si el mensaje es un string y los cambios son una lista de archivos
+                    (list mensaje cambios) ;se crea una lista que contiene el mensaje y los cambios
                     null)))
 
 ;Pertenencia
-;Desc: verifica si el elemento entregado corresponde a un commit o no, el cual debe ser una lista de 2 elementos, donde cada uno es string y el otro es una lista 
-;Dom: lista
-;Rec: un valor booleano
+;Desc: verifica si el elemento ingresado corresponde a un commit o no, el cual debe ser una lista de 2 elementos, donde el primero es un string y el otro es una lista 
+;Dom: commit
+;Rec: booleano
 (define commit? (lambda (commit)
-                    (if (and (list? commit)(= (length commit) 2) (string? (car commit)) (list? (cadr commit)))
-                        #t
+                  ;si el commit ingresado es una lista de largo 2, donde el primer elemento es un string y el segundo es una lista
+                    (if (and (list? commit)(= (length commit) 2) (string? (car commit)) (list? (cadr commit)) (andmap esArchivo? (cadr commit)))
+                        #t ;retorna verdadero
                         #f)))
 
 ;Selectores
@@ -24,17 +29,19 @@
 ;dom: commit
 ;rec: string
 (define mensaje (lambda (commit)
+                        ;si es un commit
                         (if (commit? commit)
-                            (car commit)
-                            null
+                            (car commit) ;entrega el primer elemento
+                            null ;sino, nulo
                             )))
 
 ;descripción: Función que retorna cambios en un commit
 ;dom: commit
 ;rec: lista
 (define cambios (lambda (commit)
+                    ;si es un commit
                     (if (commit? commit)
-                        (cadr commit)
+                        (cadr commit) ;se entrega el segundo elemento
                         0 ;ya que los cambios son una lista y puede estar vacía
                         )))
 

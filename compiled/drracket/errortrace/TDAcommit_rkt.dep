@@ -1,1 +1,1 @@
-("7.6" racket ("31963f3cdd77766e6958fa6d7af931f7599b702f" . "8314027ed4c1c6fd9c412af77103e94790e59dd2") (collects #"errortrace" #"errortrace-key.rkt") (collects #"racket" #"main.rkt") (collects #"racket" #"runtime-config.rkt"))
+("7.6" racket ("0071340c83617195e62daec54dd074f04d47a962" . "004c9b3dae2151665ede6a3f9c6de2d3b20b4f4b") #"C:\\Users\\jvelo\\Desktop\\Paradigmas\\Lab1Paradigmas\\funcionesGenerales.rkt" (collects #"errortrace" #"errortrace-key.rkt") (collects #"racket" #"main.rkt") (collects #"racket" #"runtime-config.rkt"))

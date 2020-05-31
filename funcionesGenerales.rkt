@@ -2,7 +2,7 @@
 
 ;Desc: agrega un elemento al final de una lista
 ;Dominio: elemento x lista
-;Recorrido: una lista con el elemento agregado
+;Recorrido: lista
 ;Recursión: natural
 (define myAppend (lambda(elemento lista)
                  (if (null? lista)
@@ -12,7 +12,7 @@
 
 ;Función que une dos listas
 ;Dominio: lista x lista
-;Recorrido: una lista
+;Recorrido: lista
 ;Recursión: natural
 (define myAppend2 (lambda (L1 L2)
                      (if (null? L1) ;si la lista 1 está nula, se entrega la lista 2
@@ -43,4 +43,15 @@
                            (if (equal? (car archivo) (car(car lista))) ;si el nombre del archivo es igual a algún nombre de archivo dentro de la lista
                                #f ;se retorna falso, lo que quiere decir que ya está ese archivo en la lista
                                (noEstaArchivo? archivo (cdr lista)))))) ;sino, se hace un llamado recursivo, revisando la cola de la lista
+
+(define esArchivo? (lambda (e)
+                     (if (list? e)
+                         (if (null? e)
+                         #f
+                         (if (and (= (length e) 2) (string? (car e)) (string? (cadr e)))
+                             #t
+                             #f))
+                         #f)
+                     
+                     ))
 (provide (all-defined-out))

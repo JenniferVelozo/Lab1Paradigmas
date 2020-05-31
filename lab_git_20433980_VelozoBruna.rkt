@@ -3,13 +3,13 @@
 (require "TDAcommit.rkt")
 (require "funcionesGenerales.rkt")
 
-(define workspace (list (list "archivo1" "contenido1") (list "archivo2" "contenido2") (list "archivo3" "contenido3")))
-(define index (list (list "file1.rkt" "codigo1") (list "file2.rkt" "codigo2")))
-(define localR (list (list "Edición" (list( list "file1" "contenido1") (list"file2" "contenido2"))) ))
-(define remoteR (list (list "Se editó archivo 2 y 6" (list( list "file2" "contenido1") (list"file6" "contenido2"))) (list "Se editó archivo 2" (list( list "file2" "contenido1ver2") (list"file6" "contenido2")))))
+;(define workspace (list (list "archivo1" "contenido1") (list "archivo2" "contenido2") (list "archivo3" "contenido3")))
+;(define index (list (list "file1.rkt" "codigo1") (list "file2.rkt" "codigo2")))
+;(define localR (list (list "Edición" (list( list "file1" "contenido1") (list"file2" "contenido2"))) ))
+;(define remoteR (list (list "Se editó archivo 2 y 6" (list( list "file2" "contenido1") (list"file6" "contenido2"))) (list "Se editó archivo 2" (list( list "file2" "contenido1ver2") (list"file6" "contenido2")))))
 
-(define zonas (zonasCons workspace index localR remoteR null))
-;----------------------------------------------------- FUNCIÓN GIT ------------------------------------------------------------------------
+;(define zonas (zonasCons workspace index localR remoteR null))
+;-------------------------------------------------------------- FUNCIÓN GIT --------------------------------------------------------------------------------------
 ;desc:Función que permite aplicar los comandos sobre las zonas de trabajo.
 ;dom: funcion x parámetro
 ;rec: una función que recibe los parámetros propios del comando que se pretende aplicar.
@@ -22,7 +22,7 @@
                     ;sino, se aplica la funcion al parametro ingresado
                     (funcion parametro)))))
  
-;---------------------------------------------------- FUNCIÓN PULL ------------------------------------------------------------------------
+;---------------------------------------------------------------- FUNCIÓN PULL ----------------------------------------------------------------------------------
 ;desc: función que entrega una lista con los cambios de un commit
 ;dom: cambios hechos (lista)
 ;rec: lista
@@ -63,7 +63,7 @@
                                         (myAppend "pull" (comandos zonas)))
                    (display "El parametro ingresado no crresponde a una zona"))))
 
-;--------------------------------------------------------------- FUNCIÓN ADD ----------------------------------------------------------------------
+;--------------------------------------------------------------- FUNCIÓN ADD -------------------------------------------------------------------------------------
 ;desc: función que añade los archivos de la lista 1, contenidos en el workspace, a una lista 2
 ;dom: lista x lista x lista
 ;rec: lista
@@ -103,7 +103,7 @@
                                   
                               
 
-;-------------------------------------------------------------- FUNCIÓN COMMIT -------------------------------------------------------------------
+;-------------------------------------------------------------- FUNCIÓN COMMIT -----------------------------------------------------------------------------------
 ;desc: función que crea un commit si hay cambios en el Index
 ;dom: string x lista
 ;rec: commit o 0 en caso que no hayan cambios en el Index
@@ -125,7 +125,7 @@
                        (display "No se ingresaron los parametros correctos\n"))
                    )))
 
-;------------------------------------------------------------- FUNCIÓN PUSH --------------------------------------------------------------------
+;------------------------------------------------------------- FUNCIÓN PUSH --------------------------------------------------------------------------------------
 ;desc: Función auxiliar que entrega el Repositorio Remoto modificado
 ;dom: lista x lista
 ;rec: lista (repositorio remoto modificado)
@@ -148,7 +148,7 @@
                    (display "El parametro ingresado no corresponde a una zona"))
                ))
 
-;------------------------------------------------------------- FUNCIÓN ZONAS->STRING ----------------------------------------------------------------
+;------------------------------------------------------------- FUNCIÓN ZONAS->STRING -----------------------------------------------------------------------------
 ;desc: Función que transforma el Workspace y el Index a un string
 ;dom: lista x string
 ;rec: string
@@ -172,7 +172,7 @@
                                                                       "Archivos: \n"(listToString (cambios(car lista)) "") " \n ")))
                         0)))
 
-;desc: Función que transforma una lista a string
+;desc: Función que transforma el registro de comandos a string
 ;dom: lista x string
 ;rec: string
 ;tipo de recursión: de cola
@@ -193,7 +193,34 @@
                             "El parametro ingresado no corresponde a una zona");sino se retorna un mensaje de error
                         ))
 
-;--------------------------------------- EJEMPLOS DE USO ---------------------------------------------------
+;----------------------------------------------------------- EJEMPLOS DE USO ------------------------------------------------------------------------------------
+;TDA zonas
+;se definen previamente las zona de trabajo
+#|
+(define workspace (list (list "archivo1" "contenido1") (list "archivo2" "contenido2") (list "archivo3" "contenido3")))
+(define index (list (list "file1.rkt" "codigo1") (list "file2.rkt" "codigo2")))
+(define localR (list (list "Edición" (list( list "file1" "contenido1") (list"file2" "contenido2"))) ))
+(define remoteR (list (list "Se editó archivo 2 y 6" (list( list "file2" "contenido1") (list"file6" "contenido2"))) (list "Se editó archivo 2" (list( list "file2" "contenido1ver2") (list"file6" "contenido2")))))
+
+;3 ejemplos de uso
+;uso del constructor
+(zonasCons workspace index localR remoteR null);retorna una lista con las zonas de trabajo
+;uso de pertenencia
+(zonas? (list "archivo1.rkt" "archivo2.rkt")) ;en este caso retorna falso, ya que no es del tipo zonas
+;uso de un selector
+(zonaIndex (zonasCons workspace index localR remoteR null)) ;retorna lista de archivos del index
+|#
+
+;TDA commit
+;uso del constructor
+#|
+(commitCons "mi primer commit" (list (list "archivo1.rkt" "contenido1") (list "archivo2.rkt" "archivo2")))
+;uso de pertenencia
+(commit? (list "mi primer commit" (list (list "file1.rkt" "contenido1") (list "file2.rkt" "contenido2"))))
+;uso de un selector
+(mensaje (list "mi primer commit" (list (list "file1.rkt" "contenido1") (list "file2.rkt" "contenido2"))))
+|#
+
 ;FUNCIÓN GIT
 
 #|
