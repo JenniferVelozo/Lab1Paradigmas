@@ -3,12 +3,6 @@
 (require "TDAcommit.rkt")
 (require "funcionesGenerales.rkt")
 
-;(define workspace (list (list "archivo1" "contenido1") (list "archivo2" "contenido2") (list "archivo3" "contenido3")))
-;(define index (list (list "file1.rkt" "codigo1") (list "file2.rkt" "codigo2")))
-;(define localR (list (list "Edición" (list( list "file1" "contenido1") (list"file2" "contenido2"))) ))
-;(define remoteR (list (list "Se editó archivo 2 y 6" (list( list "file2" "contenido1") (list"file6" "contenido2"))) (list "Se editó archivo 2" (list( list "file2" "contenido1ver2") (list"file6" "contenido2")))))
-
-;(define zonas (zonasCons workspace index localR remoteR null))
 ;-------------------------------------------------------------- FUNCIÓN GIT --------------------------------------------------------------------------------------
 ;desc:Función que permite aplicar los comandos sobre las zonas de trabajo.
 ;dom: funcion x parámetro
@@ -61,7 +55,7 @@
                (if (zonas? zonas)
                    (setRegistroComandos (setWorkspace zonas (myPull3 (zonaWorkspace zonas) (myPull3 (reverse (myPull2 (zonaRemoteR zonas))) null)))
                                         (myAppend "pull" (comandos zonas)))
-                   (display "El parametro ingresado no crresponde a una zona"))))
+                   (display "El parametro ingresado no corresponde a una zona"))))
 
 ;--------------------------------------------------------------- FUNCIÓN ADD -------------------------------------------------------------------------------------
 ;desc: función que añade los archivos de la lista 1, contenidos en el workspace, a una lista 2
